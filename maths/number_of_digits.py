@@ -60,7 +60,19 @@ def num_digits_fast(n: int) -> int:
     """
     if not isinstance(n, int):
         raise TypeError("Input must be an integer")
-    return 1 if n == 0 else math.floor(math.log10(abs(n)) + 1)
+    if n == 0:
+        return 1
+
+    n = abs(n)
+    digits = math.floor(math.log10(n)) + 1
+    # log10() works in floating point, so values just below a power of ten
+    # (e.g. 10**16 - 1) can round up and overshoot by one digit.  Correct the
+    # estimate with exact integer comparisons.
+    if n < 10 ** (digits - 1):
+        digits -= 1
+    elif n >= 10**digits:
+        digits += 1
+    return digits
 
 
 def num_digits_faster(n: int) -> int:
